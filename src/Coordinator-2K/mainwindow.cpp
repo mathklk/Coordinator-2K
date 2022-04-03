@@ -160,13 +160,18 @@ void MainWindow::on_pushButtonExport_clicked()
     ui->labelDone->setText("Exported to " + saveFileName);
 }
 
+bool MainWindow::_shouldDisplay(void)
+{
+     return _livePreview && (nullptr != _workMap);
+}
+
 /**
  * @brief Zooming in and out
  */
 void MainWindow::on_pushButtonZoomIn_clicked()
 {
     _dispZoomFactor *= _dispZoomAdvanceFactor;
-    if (_livePreview) {
+    if (_shouldDisplay()) {
         _displayWorkMap();
     }
 }
@@ -174,7 +179,7 @@ void MainWindow::on_pushButtonZoomIn_clicked()
 void MainWindow::on_pushButtonZoomOut_clicked()
 {
     _dispZoomFactor /= _dispZoomAdvanceFactor;
-    if (_livePreview) {
+    if (_shouldDisplay()) {
         _displayWorkMap();
     }
 }
@@ -187,7 +192,7 @@ void MainWindow::on_zoomAdvanceSpinbox_valueChanged(double arg1)
 void MainWindow::on_spinBoxOffsetX_valueChanged(int arg1)
 {
     _offsetTopLeftX = arg1;
-    if (_livePreview) {
+    if (_shouldDisplay()) {
         _loadCleanScaled();
         _drawGrid();
         _displayWorkMap();
@@ -197,7 +202,7 @@ void MainWindow::on_spinBoxOffsetX_valueChanged(int arg1)
 void MainWindow::on_spinBoxOffsetY_valueChanged(int arg1)
 {
     _offsetTopLeftY = arg1;
-    if (_livePreview) {
+    if (_shouldDisplay()) {
         _loadCleanScaled();
         _drawGrid();
         _displayWorkMap();
@@ -207,7 +212,7 @@ void MainWindow::on_spinBoxOffsetY_valueChanged(int arg1)
 void MainWindow::on_spinBoxFontSize_valueChanged(int arg1)
 {
     _fontSize = arg1;
-    if (_livePreview) {
+    if (_shouldDisplay()) {
         _loadCleanScaled();
         _drawGrid();
         _displayWorkMap();
@@ -217,7 +222,7 @@ void MainWindow::on_spinBoxFontSize_valueChanged(int arg1)
 void MainWindow::on_checkBoxLivePreview_stateChanged(int arg1)
 {
     _livePreview = arg1;
-    if (_livePreview && (nullptr != _workMap)) {
+    if (_shouldDisplay()) {
         _loadCleanScaled();
         _drawGrid();
         _displayWorkMap();
@@ -234,7 +239,7 @@ void MainWindow::on_pushButtonColor_clicked()
         ui->labelColor->setAutoFillBackground(true);
         ui->labelColor->setPalette(p);
 
-        if (_livePreview) {
+        if (_shouldDisplay()) {
             _loadCleanScaled();
             _drawGrid();
             _displayWorkMap();
@@ -244,7 +249,17 @@ void MainWindow::on_pushButtonColor_clicked()
 
 void MainWindow::on_spinBoxLineWidth_valueChanged(int)
 {
-    if (_livePreview) {
+    if (_shouldDisplay()) {
+        _loadCleanScaled();
+        _drawGrid();
+        _displayWorkMap();
+    }
+}
+
+void MainWindow::on_spinBoxScaleFactor_valueChanged(int arg1)
+{
+    _scaleFactor = arg1;
+    if (_shouldDisplay()) {
         _loadCleanScaled();
         _drawGrid();
         _displayWorkMap();

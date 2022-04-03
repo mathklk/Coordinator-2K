@@ -43,10 +43,13 @@ private slots:
 
     void on_spinBoxLineWidth_valueChanged(int arg1);
 
+    void on_spinBoxScaleFactor_valueChanged(int arg1);
+
 private:
     void _loadCleanScaled(void);
     void _drawGrid(void);
     void _displayWorkMap(void);
+    bool _shouldDisplay(void);
 
 private:
     Ui::MainWindow *ui;

@@ -14,6 +14,8 @@ Application screenshot:
 
 ✔️Zoomable & Scrollable Preview Window
 
+✔️Adjustable Scale factor (how many final pixels per original pixel)
+
 ✔️Adjustable x-y-offset
 
 ✔️Adjustable font size
