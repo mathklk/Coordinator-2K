@@ -3,6 +3,7 @@
 
 #include <QFile>
 #include <QFileDialog>
+#include <QColorDialog>
 #include <QPixmap>
 #include <QDebug>
 
@@ -15,6 +16,10 @@ MainWindow::MainWindow(QWidget *parent)
     _disp = new QLabel();
     ui->scrollArea->setBackgroundRole(QPalette::Dark);
     ui->scrollArea->setWidget(_disp);
+    QPalette p;
+    p.setColor(ui->labelColor->backgroundRole(), Qt::black);
+    ui->labelColor->setAutoFillBackground(true);
+    ui->labelColor->setPalette(p);
 }
 
 MainWindow::~MainWindow()
@@ -48,7 +53,6 @@ void MainWindow::_displayWorkMap(void)
  */
 void MainWindow::on_pushButtonSelectImage_clicked()
 {
-
     _sourceImageFileName = QFileDialog::getOpenFileName(
         this,
         "Select Source Image",
@@ -65,7 +69,9 @@ void MainWindow::on_pushButtonSelectImage_clicked()
         _drawGrid();
         _displayWorkMap();
     }
-    ui->currentSourceFileLabel->setText("Current Source File\n" + _sourceImageFileName);
+    ui->currentSourceFileLabel->setText("Current Source File: " + _sourceImageFileName);
+    ui->pushButtonExport->setEnabled(true);
+
 }
 
 void MainWindow::_loadCleanScaled(void)
@@ -94,13 +100,18 @@ void MainWindow::_drawGrid(void) {
 
     int const actualHeight = _workMap->size().height();
     int const actualWidth = _workMap->size().width();
-    qDebug() << tx << ty << actualHeight << actualWidth;
+
+    QPen pen;
+    pen.setColor(_color);
+    pen.setWidth(ui->spinBoxLineWidth->value());
+    _workPainter->setPen(pen);
+
     // Drawing the vertical lines by going through x
     for (int x = 0; x < tx; ++x) {
         int const actualX = x * _scaleFactor;
         _workPainter->drawLine(actualX, 0, actualX, actualHeight);
     }
-    for (int y = 0; y < tx; ++y) {
+    for (int y = 0; y < ty; ++y) {
         int const actualY = y * _scaleFactor;
         _workPainter->drawLine(0, actualY, actualWidth, actualY);
     }
@@ -130,7 +141,7 @@ void MainWindow::_drawGrid(void) {
 
 void MainWindow::on_pushButtonExport_clicked()
 {
-    ui->labelDone->setText("");
+    ui->labelDone->setText("Exporting...");
     QString const saveFileName = QFileDialog::getSaveFileName(
         this,
         "Select Export Location",
@@ -146,7 +157,7 @@ void MainWindow::on_pushButtonExport_clicked()
     QFile saveFile(saveFileName);
     saveFile.open(QIODevice::WriteOnly);
     _workMap->save(&saveFile, "PNG");
-    ui->labelDone->setText("Exported!");
+    ui->labelDone->setText("Exported to " + saveFileName);
 }
 
 /**
@@ -206,6 +217,33 @@ void MainWindow::on_spinBoxFontSize_valueChanged(int arg1)
 void MainWindow::on_checkBoxLivePreview_stateChanged(int arg1)
 {
     _livePreview = arg1;
+    if (_livePreview && (nullptr != _workMap)) {
+        _loadCleanScaled();
+        _drawGrid();
+        _displayWorkMap();
+    }
+}
+
+void MainWindow::on_pushButtonColor_clicked()
+{
+    QColor const chosenColor = QColorDialog::getColor(Qt::black, this, "Chose color");
+    if (chosenColor.isValid()) {
+        _color = chosenColor;
+        QPalette p;
+        p.setColor(ui->labelColor->backgroundRole(), _color);
+        ui->labelColor->setAutoFillBackground(true);
+        ui->labelColor->setPalette(p);
+
+        if (_livePreview) {
+            _loadCleanScaled();
+            _drawGrid();
+            _displayWorkMap();
+        }
+    }
+}
+
+void MainWindow::on_spinBoxLineWidth_valueChanged(int)
+{
     if (_livePreview) {
         _loadCleanScaled();
         _drawGrid();

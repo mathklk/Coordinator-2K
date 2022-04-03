@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QPainter>
 #include <QPixmap>
+#include <QColor>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,6 +39,10 @@ private slots:
 
     void on_pushButtonExport_clicked();
 
+    void on_pushButtonColor_clicked();
+
+    void on_spinBoxLineWidth_valueChanged(int arg1);
+
 private:
     void _loadCleanScaled(void);
     void _drawGrid(void);
@@ -54,6 +59,7 @@ private:
     int _offsetTopLeftX = 0;
     int _offsetTopLeftY = 0;
     int _fontSize = 24;
+    QColor _color = Qt::black;
 
     QString _sourceImageFileName = "";
     QPixmap _sourceImagePixmap;
